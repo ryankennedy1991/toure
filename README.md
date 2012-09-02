@@ -1,5 +1,8 @@
 ## Set Up
 
+First of all you need to just move the "toure" folder into the base of
+your app.
+
 In order to get everything set up correctly we must first define our
 constants in the conf.php file:
 
