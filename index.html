@@ -1,0 +1,232 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Toure by ryankennedy1991</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1>Toure</h1>
+        <p>A simple MySQL abstraction and input validation library.</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/ryankennedy1991/toure" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/ryankennedy1991/toure/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/ryankennedy1991/toure/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
+        <h2>Set Up</h2>
+
+<p>First of all you need to just move the "toure" folder into the base of
+your app.</p>
+
+<p>In order to get everything set up correctly we must first define our
+constants in the conf.php file:</p>
+
+<pre><code>define('DB_HOST', ''); // your database host
+define('DB_NAME', ''); // your database name
+define('DB_USER', ''); // your database username
+define('DB_PASS', ''); // your database password
+</code></pre>
+
+<p>There are also three additional settings:</p>
+
+<h3>Defult Users Table</h3>
+
+<pre><code>define('DEFAULT_USERS_TABLE', 'users');
+</code></pre>
+
+<p>the above defines the default table that holds your users when dealing
+with a user, password type situation it is 'users' by default.</p>
+
+<h3>Timestamps</h3>
+
+<pre><code>define('TIMESTAMPS', true); 
+</code></pre>
+
+<p>if your tables follow a timestamp pattern ( they have created_at and
+updated_at in every table) then setting this to true will automagically
+deal with timestamps for you.</p>
+
+<p>If you require timestamps on only select tables then set to false and
+specify the columns explicitly during execution.</p>
+
+<h3>Secure</h3>
+
+<pre><code>define('SECURE', true);
+</code></pre>
+
+<p>if you would like to make use of the libraries encryption system then
+set this to true, whenever you insert into a column named password it
+will automatically run Secure::make() and encrypt your password. If you
+are using this make sure that whenever you check your password you use
+Secure::check(); </p>
+
+<h2>Usage</h2>
+
+<h3>Include</h3>
+
+<p>Before use use any of the libraries in our code we must first include
+the libraries.</p>
+
+<p>This is simple, in every file of code you want to use the library insert
+the following at the top of your page:</p>
+
+<pre><code>include('toure/autoload');
+</code></pre>
+
+<p>All the classes will be autoloaded as and when they are needed.</p>
+
+<h3>Getting Started With The Database</h3>
+
+<p>We can create an instance ready for queries using the following:</p>
+
+<pre><code>$dbh = Database::make();
+</code></pre>
+
+<p>Now we have access to everything via $dbh, the first thing that should
+be done is the setting of our current table we plan use:</p>
+
+<pre><code>$dbh-&gt;table('posts');
+</code></pre>
+
+<p>once the table id set we can start to run our query methods inline:</p>
+
+<h3>Selecting</h3>
+
+<p>Selecting can be done using the following:</p>
+
+<pre><code>$dbh-&gt;table('posts')-&gt;select('title', 'content')-&gt;row();
+</code></pre>
+
+<p>The second method <code>select();</code> allows us to specify columns to fetch, if
+this is left blank it will select all. The second column specifies
+whether to return the first <code>row();</code> or <code>all();</code> of the rows either the <code>row();</code>
+or <code>all();</code> method must be included to run the query. Toure will return an
+assoc array by default but we can specify it to return different data: </p>
+
+<pre><code>$dbh-&gt;table('posts')-&gt;select()-&gt;all('assoc');
+$dbh-&gt;table('posts')-&gt;select()-&gt;all('num');
+$dbh-&gt;table('posts')-&gt;select()-&gt;all('obj'); 
+</code></pre>
+
+<p>To further our query we could use any of the conditional methods which
+can be added one after another for easy readable usage:</p>
+
+<ul>
+<li>where();</li>
+<li>where_email();</li>
+<li>or_();</li>
+<li>and_();</li>
+</ul><p>Which can be used like so:</p>
+
+<pre><code>$dbh-&gt;table('posts')
+    -&gt;select('title')
+    -&gt;where('id', '=', '3')
+    -&gt;or_('title', '=', 'something')
+    -&gt;all();
+</code></pre>
+
+<p>So we can mix and match different conditionals for different results,
+the <code>where();</code>, <code>or_();</code> and <code>and_();</code> methods take three params, the first being
+the column the second being the condition and the last is the value.</p>
+
+<p>Check out the class files for more documentation all methods are
+documented.</p>
+
+<h3>Inserting</h3>
+
+<p>Inserting is made extremely easy by toure, we can use the <code>insert();</code> method:</p>
+
+<pre><code>$dbh-&gt;table('posts')-&gt;insert();
+</code></pre>
+
+<p>The insert method takes an array like so:</p>
+
+<pre><code>$input = array(
+           'title' =&gt; 'This is our title',
+           'content' =&gt; 'This is our content'
+         );
+
+$dbh-&gt;table('posts')-&gt;insert($input)-&gt;save();
+</code></pre>
+
+<p>Our insert method will automagically insert the values into the columns
+specified where the array key is the column and the array value is the
+input value.</p>
+
+<p>It is important to note here that when inserting or updating it is
+required to use <code>save();</code> or your insert or update will not be executed.</p>
+
+<h3>Updating</h3>
+
+<p>Updating is done in exactly the same way as inserting, i.e using an
+array but we just specify the column that needs to be updated like so: </p>
+
+<pre><code> $input = array(
+            'content' =&gt; 'This is our content'
+          );
+
+ $dbh-&gt;table('posts')-&gt;update($input)-&gt;save();
+</code></pre>
+
+<p>The difference with update though is that we will often require
+condition otherwise if you where to execute the code above you would
+change every row in the table so we can use the same conditionals as we
+did in the select section.</p>
+
+<pre><code>$dbh-&gt;table('posts')-&gt;update($input)-&gt;where('id', '=', '3')-&gt;save();
+</code></pre>
+
+<h3>Deleting</h3>
+
+<p>Deleting can be dangerous so we have a few different methods available
+to us here. </p>
+
+<ul>
+<li><code>delete();</code></li>
+<li><code>delete_id($id);</code></li>
+<li><code>delete_all_where();</code></li>
+</ul><p>The <code>delete();</code> method can be used just like the other CRUD operations
+using the conditional methods but is allways limited to just 1 row for
+safety. </p>
+
+<p>The <code>delete_id();</code> method allows us to specify an id for deletion this
+again is limited to just one row.</p>
+
+<p>The <code>delete_all_where();</code> method allows us to delete multiple rows that
+meet the condition.</p>
+      </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/ryankennedy1991">ryankennedy1991</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
