@@ -39,7 +39,7 @@
         <ul></ul>
       </nav>
       <section>
-        <h2>Set Up</h2>
+        <h1>Set Up</h1>
 
 <p>First of all you need to just move the "toure" folder into the base of
 your app.</p>
@@ -55,7 +55,7 @@ define('DB_PASS', ''); // your database password
 
 <p>There are also three additional settings:</p>
 
-<h3>Defult Users Table</h3>
+<h3>Default Users Table</h3>
 
 <pre><code>define('DEFAULT_USERS_TABLE', 'users');
 </code></pre>
@@ -86,8 +86,6 @@ will automatically run Secure::make() and encrypt your password. If you
 are using this make sure that whenever you check your password you use
 Secure::check(); </p>
 
-<h2>Usage</h2>
-
 <h3>Include</h3>
 
 <p>Before use use any of the libraries in our code we must first include
@@ -101,7 +99,7 @@ the following at the top of your page:</p>
 
 <p>All the classes will be autoloaded as and when they are needed.</p>
 
-<h3>Getting Started With The Database</h3>
+<h1>Database Usage</h1>
 
 <p>We can create an instance ready for queries using the following:</p>
 
@@ -116,7 +114,7 @@ be done is the setting of our current table we plan use:</p>
 
 <p>once the table id set we can start to run our query methods inline:</p>
 
-<h3>Selecting</h3>
+<h2>Selecting</h2>
 
 <p>Selecting can be done using the following:</p>
 
@@ -138,10 +136,10 @@ $dbh-&gt;table('posts')-&gt;select()-&gt;all('obj');
 can be added one after another for easy readable usage:</p>
 
 <ul>
-<li>where();</li>
-<li>where_email();</li>
-<li>or_();</li>
-<li>and_();</li>
+<li><code>where();</code></li>
+<li><code>where_email();</code></li>
+<li><code>or_();</code></li>
+<li><code>and_();</code></li>
 </ul><p>Which can be used like so:</p>
 
 <pre><code>$dbh-&gt;table('posts')
@@ -155,10 +153,17 @@ can be added one after another for easy readable usage:</p>
 the <code>where();</code>, <code>or_();</code> and <code>and_();</code> methods take three params, the first being
 the column the second being the condition and the last is the value.</p>
 
+<p>Your can also use the <code>order_by():</code> method to order your results like so:</p>
+
+<pre><code>$dbh-&gt;table('posts')-&gt;select()-&gt;order_by('created_at', 'DESC')-&gt;all();
+</code></pre>
+
+<p>We can specify the column to sort on in the first argument and then the direction we want to sort using 'DESC' for descending and 'ASC' for ascending.</p>
+
 <p>Check out the class files for more documentation all methods are
 documented.</p>
 
-<h3>Inserting</h3>
+<h2>Inserting</h2>
 
 <p>Inserting is made extremely easy by toure, we can use the <code>insert();</code> method:</p>
 
@@ -182,7 +187,7 @@ input value.</p>
 <p>It is important to note here that when inserting or updating it is
 required to use <code>save();</code> or your insert or update will not be executed.</p>
 
-<h3>Updating</h3>
+<h2>Updating</h2>
 
 <p>Updating is done in exactly the same way as inserting, i.e using an
 array but we just specify the column that needs to be updated like so: </p>
@@ -202,7 +207,7 @@ did in the select section.</p>
 <pre><code>$dbh-&gt;table('posts')-&gt;update($input)-&gt;where('id', '=', '3')-&gt;save();
 </code></pre>
 
-<h3>Deleting</h3>
+<h2>Deleting</h2>
 
 <p>Deleting can be dangerous so we have a few different methods available
 to us here. </p>
@@ -220,6 +225,156 @@ again is limited to just one row.</p>
 
 <p>The <code>delete_all_where();</code> method allows us to delete multiple rows that
 meet the condition.</p>
+
+<h2>Joins</h2>
+
+<p>A database join can also be performed using <code>join();</code> The join method 
+can be used along with a <code>select();</code> method like so:</p>
+
+<pre><code>$dbh-&gt;table('users')
+    -&gt;select('users.email', 'posts.title')
+    -&gt;join('users', 'users.id = posts.user_id')
+    -&gt;all();
+</code></pre>
+
+<p>So in the table above you can see we can specify the join with two arguments, the first is the table to join and the second is the ON rule. If you require more fine control over your join statements then use the <code>query();</code> method that allows you to insert a raw query safely.</p>
+
+<h1>Validation Usage</h1>
+
+<h2>Initializing</h2>
+
+<p>Validation is an essential part of most applications that deal with a database interaction, we need to make sure that user submitted data is clean before we run it through our system and into the database. </p>
+
+<p>This would usually have to be done in a long drawn out way that we are all to familiar with, but don't worry! Toure offers a nice and easy solution.</p>
+
+<p>We start a validation test as follows:</p>
+
+<pre><code>$v = Validation::make($input, $rules, $messages);
+</code></pre>
+
+<p>This will initialize our validation and store it in the $v variable. Our validator takes three arguments. The first $input is an array of input from the user for example:</p>
+
+<pre><code>$input = array(
+            'email' =&gt; $_POST['email'],             
+            'password' =&gt; $_POST['password'],
+            'passwordconf' =&gt; '$_POST['passwordconf']
+         );
+</code></pre>
+
+<p>The next argument are our rules which are explained in the Rules section:</p>
+
+<pre><code>$rules = array(
+           'email' =&gt; 'required|valid_email',
+           'password' =&gt; 'required|min:6',
+           'passwordconf' =&gt; 'same:password'
+         );
+</code></pre>
+
+<p>and the final optional argument is our custom error messages, if the messages are not included then default error messages will be include.</p>
+
+<h2>Rules</h2>
+
+<p>We have the following rules to choose from:</p>
+
+<ul>
+<li>required - Specifies input is required</li>
+<li>string - Checks if input is string</li>
+<li>numeric - Checks if input is numeric</li>
+<li>int - Checks if input is integer</li>
+<li>unique:? - Queries database using default users table from config, column can be specified like unique:username default column is email</li>
+<li>same:? - Checks that input is the same as specified param eg. same:password</li>
+<li>min:? - Checks if a minimum amount of characters has been entered eg. min:6</li>
+<li>max:? - Checks if a maximum amount of characters has been entered eg. max:10</li>
+<li>in:? - Checks for a value in an array eg. in:products</li>
+<li>valid_email - Checks if email is valid</li>
+<li>valid_url - Checks if URL is valid</li>
+</ul><p>rules should be included as the second argument as an array with the keys corresponding to the same keys in the input array for the first argument. Multiple rules can be included as long as you separate each rule using a pipe '|' :</p>
+
+<pre><code>$rules = array(
+           'email' =&gt; 'required|valid_email',
+           'password' =&gt; 'required|min:6',
+           'passwordconf' =&gt; 'same:password'
+         );
+</code></pre>
+
+<h2>Running The Validation</h2>
+
+<p>To check whether the input has validated we can use two methods that return Boolean results:</p>
+
+<pre><code>$v-&gt;passed();
+</code></pre>
+
+<p>The above checks if there where no errors and return true if everything passed and false if not. If needed you can check the opposite using:</p>
+
+<pre><code>$v-&gt;failed();
+</code></pre>
+
+<p>We can then retrieve all our errors using the following:</p>
+
+<pre><code>$v-&gt;get_errors();
+</code></pre>
+
+<p>This will return and associative array including any errors that where returned to us from the validation if nothing went wrong this will be empty. We can retrieve errors specific to an input if we like using:</p>
+
+<pre><code>$v-&gt;errors('email');
+</code></pre>
+
+<p>The above will only return the errors from the email input field.</p>
+
+<h2>Custom Error Messages</h2>
+
+<p>The validation class will automatically return error messages but if you would like to use your own and it is recommended that you do, you can include a third argument to the <code>Validation::make();</code> method, an array of message where the key is the field and rule your error message applies to separated by an underscore like so:</p>
+
+<pre><code>$messages = array(
+              'email_required' =&gt; 'Email is required!', 
+              'email_valid_email' =&gt; 'Please enter a valid email address!',
+              'passwordconf_same' =&gt; 'Passwords do not match!'
+            );
+</code></pre>
+
+<p>The above will then map the error messages to the right rules and input fields so that when you use <code>$v-&gt;get_errors();</code> your messages will be returned instead.</p>
+
+<h2>Validation Example</h2>
+
+<p>Putting all the above together can be quite confusing at first so let's go through a real world example to show you how useful the validation library is.</p>
+
+<p>Let's say we have someone who will be entering information to create a new user through a form using the POST method. First lets catch all the data and assign it to variables:</p>
+
+<pre><code>$email = $_POST['email'];
+$password = $_POST['password'];
+$passwordconf = $_POST['passwordconf'];
+</code></pre>
+
+<p>Next we need to fire up our validation and pass in three arguments that consist of the input, rules and custom error messages:</p>
+
+<pre><code>$input = array(
+           'email' =&gt; $email,
+           'password' =&gt; $password,
+           'passwordconf' =&gt; $passwordconf
+         );
+
+$rules = array(
+           'email' =&gt; 'required|valid_email',
+           'password' =&gt; 'required|min:6',
+           'passwordconf' =&gt; 'required|same:password'
+         );
+
+$messages = array(
+           'email_required' =&gt; "Email is required",
+           'email_valid_email' =&gt; 'Email is not valid',
+           'passwordconf_same' =&gt; 'Passwords do not match' 
+         );
+
+$v = Validation::make($input, $rules, $messages);
+
+if ($v-&gt;passed()){
+    echo "passed!";
+} else {
+    $errors = $v-&gt;get_errors();
+}
+</code></pre>
+
+<p>The code above will now run our validation and if it passes will show us a message saying "passed" or will set our errors to a variable called errors which we can manipulate further if we like.</p>
       </section>
       <footer>
         <p>Project maintained by <a href="https://github.com/ryankennedy1991">ryankennedy1991</a></p>
