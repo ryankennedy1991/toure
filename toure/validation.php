@@ -242,8 +242,8 @@ protected function int($input, $value){
  	*	Queries database to check whether input exists in colum using table specified in config 
 	----------------------------------------------------------------------------------------*/
 
-protected function unique($input, $value){
-	if(User::exists($value)){
+protected function unique($input, $value, $param){
+	if(User::exists($value, $param)){
 		return $this->log_error($input, "$input already exists", 'unique');
 	} else {
 		return true;
