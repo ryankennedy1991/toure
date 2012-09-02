@@ -39,7 +39,44 @@
         <ul></ul>
       </nav>
       <section>
-        <h1>Set Up</h1>
+        <h1>What is Toure?</h1>
+
+<p>Toure (pronounced tour-ray) is a MySQL abstraction and input validation library, what this means is that you can say goodbye to all that complicated database code and validation and use a set of simple and easy to understand methods for example. </p>
+
+<h3>Connecting to a database?</h3>
+
+<p>Normal</p>
+
+<pre><code>$dbh = new PDO('mysql=host=localhost;dbname=test', 'user', 'pass');
+</code></pre>
+
+<p>Toure</p>
+
+<pre><code>$dbh = Database::make();
+</code></pre>
+
+<h3>Selecting a table?</h3>
+
+<p>PDO </p>
+
+<pre><code>$stmt = $dbh-&gt;prepare('SELECT * FROM posts WHERE id = ?');
+$stmt-&gt;execute(array(4));
+$result = $stmt-&gt;fetchAll(PDO::FETCH_ASSOC);
+</code></pre>
+
+<p>Toure</p>
+
+<pre><code>$result = $dbh-&gt;table('posts')-&gt;select()-&gt;where('id', '=', '3')-&gt;all();
+</code></pre>
+
+<p>Everything is escaped and safe and the library even has its on secure encryption system. Please read on to get up and running and save yourself time!</p>
+
+<h1>Requirements</h1>
+
+<ul>
+<li>PHP 5.3+</li>
+<li>PDO</li>
+</ul><h1>Set Up</h1>
 
 <p>First of all you need to just move the "toure" folder into the base of
 your app.</p>
