@@ -11,7 +11,7 @@ class Database {
 
 	private $table; // This is our table chosen with selectTable.
 
-	private $sql; // This is our raw sql statement that is passed around to methods.
+	public  $sql; // This is our raw sql statement that is passed around to methods.
 
 	private $stmt; // This is our prepared statement passed around for methods.
 
@@ -340,7 +340,8 @@ class Database {
 		if(empty($input)) return 'please enter an assoc array as array("column" => "value")';
 
 		if($this->secure == true && isset($input['password'])){	
-		$input['password'] = Secure::make($input['password']);
+			$s = new Secure();
+			$input['password'] = $s->make($input['password']);
 		}
 		
 		// pull keys from assoc array
@@ -499,7 +500,8 @@ class Database {
 	public function update(array $input){
 
 	if($this->secure == true && isset($input['password'])){	
-	$input['password'] = Secure::make($input['password']);
+		$s = new Secure();
+		$input['password'] = $s->make($input['password']);
 	}
 
 	// pull keys from assoc array
@@ -556,6 +558,7 @@ class Database {
 		$this->stmt = $this->connection->prepare($this->sql);
 		$result = $this->stmt->execute($this->values);
 		$this->last_id = $this->connection->lastInsertId();
+		$this->stmt->closeCursor();
 		return $result;
 	}
 
